@@ -1,8 +1,8 @@
 """
 命令行工具
 """
-import inspect
 import argparse
+import inspect
 
 
 class Command(object):
