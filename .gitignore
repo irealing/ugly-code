@@ -37,3 +37,4 @@ nosetests.xml
 .idea/
 venv/
 .env/
+*_debug.py

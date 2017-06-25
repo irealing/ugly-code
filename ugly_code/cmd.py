@@ -1,8 +1,9 @@
 """
 命令行工具
 """
-import inspect
 import argparse
+import inspect
+from types import FunctionType
 
 
 class Command(object):
@@ -25,7 +26,7 @@ class Command(object):
             sar = '-{}'.format(key)
             is_require = param.default is inspect._empty
             pdf = None if is_require else param.default
-            self.parser.add_argument(sar, default=pdf, required=is_require)
+            self.parser.add_argument(sar, type=pt, default=pdf, required=is_require)
 
     @property
     def keys(self):
@@ -43,3 +44,21 @@ class Command(object):
         _ns, _ = self.parser.parse_known_args()
         args = [getattr(_ns, key) for key in self._keys]
         return self.func(*args)
+
+
+class CommandHolder(object):
+    """
+    持有command对象
+    """
+
+    def __init__(self):
+        pass
+
+    def register(self, *args: tuple):
+        pass
+
+    def command(self, func: FunctionType) -> Command:
+        pass
+
+    def run(self):
+        pass
