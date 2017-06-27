@@ -42,3 +42,4 @@ $ python3 setup.py bdist_wheel
 # 安装依赖
 $ pip install dist/ugly_code****.whl
 ```
+*[更多说明](https://fuser.cn/pythonzhuang-shi-qi-shi-jian-zhi-ming-ling-xing-gong-ju/)*
