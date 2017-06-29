@@ -29,28 +29,47 @@ class Command(object):
             sar = '-{}'.format(key)
             is_require = param.default is inspect._empty
             pdf = None if is_require else param.default
-            self.parser.add_argument(sar, type=pt, default=pdf, required=is_require)
+            self.parser.add_argument(
+                sar, type=pt, default=pdf, required=is_require)
 
     @property
     def name(self):
+        """
+        名称
+        """
         return self._name
+
+    @name.setter
+    def name(self, value):
+        """
+        设置名称
+        """
+        self._name = value
 
     @property
     def describe(self):
+        """说明"""
         return self._describe
+
+    @describe.setter
+    def describe(self, value):
+        """
+        设置说明
+        """
+        self._describe = value
 
     @property
     def keys(self):
         """
         params list
-        :return: 
+        :return: str
         """
         return self._keys
 
     def __call__(self):
         """
         自动注入通过命令行获取的参数
-        :return: 
+        :return: str
         """
         _ns, _ = self.parser.parse_known_args()
         args = [getattr(_ns, key) for key in self._keys]
@@ -67,21 +86,37 @@ class CMDHolder(object):
         初始化
         :param import_name: 导入Command 的 module
         """
-        assert import_name in sys.modules, 'module not found {}'.format(import_name)
+        assert import_name in sys.modules, 'module not found {}'.format(
+            import_name)
         scope = sys.modules[import_name].__dict__
-        self._operation = {item.name: item for item in scope.values() if isinstance(item, Command)}
+        self._operation = {
+            item.name: item for item in scope.values() if isinstance(item, Command)}
         self._usage = None
 
     @property
     def usage(self):
         """
         描述信息
-        :return: 
+        :return: str
         """
         if not self._usage:
-            detail = "\n".join(('\t{}\t{}'.format(item.name, item.describe) for item in self._operation.values()))
+            detail = "\n".join(('\t{}\t{}'.format(item.name, item.describe)
+                                for item in self._operation.values()))
             self._usage = 'Create by {}\n{}'.format(CMDHolder.__name__, detail)
         return self._usage
+
+    @staticmethod
+    def command(name: str, describe: str = "")->Command:
+        """
+        创建Command对象
+        """
+        def _wrap(func):
+            cmd = Command(func)
+            cmd.name = name
+            if describe:
+                cmd.describe = describe
+            return cmd
+        return _wrap
 
     def execute(self):
         """
