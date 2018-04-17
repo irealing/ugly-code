@@ -124,7 +124,7 @@ class CMDHolder(object):
         :return: 
         """
         operation = sys.argv[1] if len(sys.argv) > 1 else None
-        if not operation:
+        if not operation or operation not in self._operation:
             print(self.usage)
             sys.exit('Unsupported Operation {}.'.format(operation))
         self._operation[operation]()
