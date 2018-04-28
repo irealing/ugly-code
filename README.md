@@ -82,11 +82,6 @@ Command line create by ugly-code.
 ## 安装方法
 
 ```shell
-# 克隆项目到本地
-$ git clone https://git.oschina.net/irealing/ugly-code.git
-# 编译项目,此操作会在dist目录生成可以用 pip 工具安装的whl文件
-$ python3 setup.py bdist_wheel
-# 安装依赖
-$ pip install dist/ugly_code****.whl
+$ pip install ugly-code
 ```
 *[更多说明](https://fuser.cn/pythonzhuang-shi-qi-shi-jian-zhi-ming-ling-xing-gong-ju/)*
