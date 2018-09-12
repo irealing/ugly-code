@@ -86,6 +86,68 @@ $ pip install ugly-code
 ```
 ## 网络/IP相关工具
 
-* 即将更新
+### IP工具(IPv4)
+#### IP地址和INT互转
+```python
+from ugly_code.net import IPv4
+# IP地址转INT
+iv = IPv4.ipn("192.168.99.0")
+print(iv)
+# 输出 3232260864
+# INT 转为IP
+ip=IPv4.nip(iv)
+print(ip)
+# 输出 192.168.99.0
+```
 
-*[更多说明](https://fuser.cn/pythonzhuang-shi-qi-shi-jian-zhi-ming-ling-xing-gong-ju/)*
+#### 是否私有IP
+
+```python3
+from ugly_code.net import IPv4
+
+iv=IPv4("192.168.99.233")
+
+print(iv.is_private())
+# 输出 True
+```
+
+#### 其它
+
+```python3
+from ugly_code.net import IPv4
+
+ip = IPv4('192.168.99.233')
+# 获取默认子网掩码
+print(ip.default_mask_str())
+# 输出  255.255.255.0
+
+#  检测是否本地回环地址
+print(ip.is_loop_back())
+# 输出 False
+```
+
+* `IPv4`重写了包含 *>*、*<*、*==*、*!=*、*<=*、*>=* 的操作符
+
+### Network工具
+
+```python3
+from ugly_code.net import IPv4,Network
+
+nt = Network('192.168.99.0',mask=24)
+# 输出网络地址
+print(nt.net_address())
+# 输出 192.168.99.0
+print(Network('10.0.0.235',mask=24))
+# 输出 10.0.0.0
+# 输出子网掩码
+print(nt.mask())
+# 输出 255.255.255.0
+# 输出广播地址
+print(nt.broadcast_address())
+# 输出 192.168.99.255
+# 检测 IP 是否在该网络中
+print(IPv4('192.168.99.99') in nt)
+输出结果 True
+```
+
+*[更多说明](http://vvia.xyz/wJ6Kwk)*
