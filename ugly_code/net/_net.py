@@ -68,8 +68,23 @@ class IPv4:
     def is_zero(self):
         return self.__value == 0
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other):
         return isinstance(other, IPv4) and self.__value == other.value
+
+    def __lt__(self, other):
+        return isinstance(other, IPv4) and self.__value < other.value
+
+    def __gt__(self, other):
+        return isinstance(other, IPv4) and self.__value > other.value
+
+    def __le__(self, other):
+        return isinstance(other, IPv4) and self.__value <= other.value
+
+    def __ge__(self, other):
+        return isinstance(other, IPv4) and self.__value >= other.value
+
+    def __ne__(self, other):
+        return isinstance(other, IPv4) and self.value != other.value
 
 
 class Network:

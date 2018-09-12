@@ -9,7 +9,7 @@ if sys.version_info < (3, 5):
 __author__ = "MemoryLeak"
 setup(
     name="ugly_code",
-    version="0.0.2",
+    version="0.0.3",
     author=__author__,
     description="ugly-code tools",
     long_description=__doc__,
