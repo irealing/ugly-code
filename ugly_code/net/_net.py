@@ -88,3 +88,13 @@ class Network:
 
     def mask(self):
         return IPv4.nip(IPv4.net_mask(self.mask_len))
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, Network) \
+               and self.net_address() == other.net_address() and self.mask_len == other.mask_len
+
+    def net_address(self) -> str:
+        return IPv4.nip(self.__start)
+
+    def broadcast_address(self) -> str:
+        return IPv4.nip(self.__end)
