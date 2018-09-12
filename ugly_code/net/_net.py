@@ -62,6 +62,15 @@ class IPv4:
     def default_mask_str(self) -> str:
         return self.nip(self.default_mask())
 
+    def is_loop_back(self) -> bool:
+        return self.array() == 127
+
+    def is_zero(self):
+        return self.__value == 0
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, IPv4) and self.__value == other.value
+
 
 class Network:
     def __init__(self, address: str, mask: int = 24):
