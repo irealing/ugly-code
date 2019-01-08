@@ -30,7 +30,7 @@ $ python cmd_debug.py  -x 1023 -y 333
 
 有默认值的参数会被设置为可选参数,无默认值则设置为必选.
 
-使用[Type Hints](https://www.python.org/dev/peps/pep-0484/)的参数可自动进行类型检查.
+使用[Type Hints](http://vvia.xyz/goyXNE)的参数可自动进行类型检查.
 ### 使用 CMDHolder持有 Command
 
 * 创建命令行工具组
@@ -102,7 +102,7 @@ print(ip)
 
 #### 是否私有IP
 
-```python3
+```python
 from ugly_code.net import IPv4
 
 iv=IPv4("192.168.99.233")
@@ -113,7 +113,7 @@ print(iv.is_private())
 
 #### 其它
 
-```python3
+```python
 from ugly_code.net import IPv4
 
 ip = IPv4('192.168.99.233')
@@ -130,7 +130,7 @@ print(ip.is_loop_back())
 
 ### Network工具
 
-```python3
+```python
 from ugly_code.net import IPv4,Network
 
 nt = Network('192.168.99.0',mask=24)
@@ -147,7 +147,18 @@ print(nt.broadcast_address())
 # 输出 192.168.99.255
 # 检测 IP 是否在该网络中
 print(IPv4('192.168.99.99') in nt)
-输出结果 True
+# 输出结果 True
+```
+### 扩展工具集
+
+#### 对象代理工具
+
+```python
+from ugly_code.ex import ObjectProxy
+
+obj = ObjectProxy(dict(a=1, b=2, c=3, d=dict(a=1, b=2)))
+print(obj.d.a)
+
 ```
 
-*[更多说明](http://vvia.xyz/wJ6Kwk)*
+*[更多说明](http://vvia.xyz/wnBAQb)*

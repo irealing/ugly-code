@@ -1,15 +1,16 @@
 """
 ugly-code 工具集
 """
-from setuptools import setup, find_packages
 import sys
+
+from setuptools import setup, find_packages
 
 if sys.version_info < (3, 5):
     sys.exit("Sorry,Python < 3.5 is not supported !")
 __author__ = "MemoryLeak"
 setup(
     name="ugly_code",
-    version="0.0.3",
+    version="0.0.4",
     author=__author__,
     description="ugly-code tools",
     long_description=__doc__,
