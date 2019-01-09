@@ -1,4 +1,9 @@
 # ugly-code
+## 安装
+
+```shell
+$ pip install ugly-code
+```
 
 ## Command 工具
 

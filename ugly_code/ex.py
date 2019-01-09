@@ -1,7 +1,7 @@
 """扩展工具模块"""
 from typing import Any
 
-__author__ = 'Memory_Leak<yuz@cnns.net>'
+__author__ = 'Memory_Leak<irealing@163.com>'
 __all__ = ('ObjectProxy',)
 
 

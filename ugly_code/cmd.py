@@ -106,16 +106,18 @@ class CMDHolder(object):
         return self._usage
 
     @staticmethod
-    def command(name: str, describe: str = "")->Command:
+    def command(name: str, describe: str = "") -> Command:
         """
         创建Command对象
         """
+
         def _wrap(func):
             cmd = Command(func)
             cmd.name = name
             if describe:
                 cmd.describe = describe
             return cmd
+
         return _wrap
 
     def execute(self):
