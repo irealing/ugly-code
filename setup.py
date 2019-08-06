@@ -13,8 +13,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 setup(
     name="ugly_code",
     url='http://vvia.xyz/wnBAQb',
-    version="0.0.6",
-    license='MIT',
+    version="0.0.7", license='MIT',
     author=__author__,
     author_email='irealing@163.com',
     platforms='any',
