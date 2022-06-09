@@ -8,12 +8,17 @@ from typing import Callable, Tuple, Sequence, NamedTuple, Union
 from xmlrpc.server import SimpleXMLRPCServer
 
 from ._tool import _println
-from ._typing import RunIt, Switch, RunItException
+from .typing import RunIt, Switch, RunItException
 
 __author__ = 'Memory_Leak<irealing@163.com>'
 
 
 class Worker(RunIt, metaclass=abc.ABCMeta):
+    """
+    Worker抽象类，`ugly_code.runit` 的核心类。
+
+    实现多进程服务种单一进程的调度管理。继承自`RunIt`。
+    """
 
     def __init__(self, switch: Switch):
         super().__init__(switch)
@@ -108,6 +113,44 @@ WorkerInfo = Union[
 
 
 class Runner(RunIt):
+    """
+    多进程任务调度工具
+
+    :param switch: 控制Runner的开关，非必选
+    :param fork: 注册多进程任务
+    :param m: XML-RPC服务监听地址，为空则不启动XML-RPC服务
+
+    fork 用户注册多进程任务,接手元组序列
+    元组长度为2-5，五个参数分别为<br>
+    | 任务名称 | 生成Worker对象的可执行对象 | 重试标志 | 重试延迟时间 | 是否自动启动(是否在Runner.run后启动) |
+
+    示例
+    ```python3
+    import threading
+    import time
+
+    from ugly_code.runit import Switch, Worker, Runner
+
+
+    class AWorker(Worker):
+        def serve(self):
+            while self.switch.on:
+                print(f"{self.switch.name} {time.time()}")
+                time.sleep(3.0)
+
+
+    def close_it(switch: Switch):
+        time.sleep(10)
+        switch.close()
+
+
+    if __name__ == '__main__':
+        st = Switch('Runner')
+        threading.Thread(target=close_it, args=(st,)).start()
+        Runner(st, (("a", AWorker), ('b', AWorker)), m=('127.0.0.1', 0)).run()
+
+    ```
+    """
 
     def __init__(self, switch: Switch = None, fork: Sequence[WorkerInfo] = None, m: ManagerAddress = None):
         super().__init__(switch or Switch("{}:{}".format(self.__class__.__name__, os.getpid())))
@@ -122,9 +165,20 @@ class Runner(RunIt):
     manager = property(lambda self: self._manager)
 
     def register(self, tag: str, f: Callable[[Switch], Worker], rc: int = 0, rdelay: float = 3.0, auto: bool = False):
+        """
+        注册任务
+
+        :param tag: 任务标签
+        :param f: 生成Worker对象的可执行对象
+        :param rc: 重试标志
+        :param rdelay: 重试延迟
+        :param auto: 是否自动启动
+        :return:
+        """
         self._fork_mapping.update({tag: _RegisterInfo(tag, f, rc, rdelay, auto)})
 
     def start(self, tag: str):
+        """使用tag启动新任务，已有相同tag任务则使用序号区分，即tag为"{tag}-{seq}"形式 """
         self.println("start process {}", tag)
         if tag not in self._fork_mapping:
             raise RunItException(404, 'unknown tag {}'.format(tag))
