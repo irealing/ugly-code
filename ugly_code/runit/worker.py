@@ -30,9 +30,15 @@ class Worker(RunIt, metaclass=abc.ABCMeta):
 
 class _ManagerItem(NamedTuple):
     tag: str
-    seq: int
     process: Process
     switch: Switch
+
+    def stats(self) -> dict:
+        return dict(tag=self.tag, pid=self.process.pid, alive=self.process.is_alive())
+
+    @staticmethod
+    def new(process: Process, switch: Switch) -> '_ManagerItem':
+        return _ManagerItem(switch.name, process, switch)
 
 
 class WorkerManager:
@@ -51,7 +57,7 @@ class WorkerManager:
             seq = self.get_seq(tag)
             switch = Switch(tag if not seq else "{}-{}".format(tag, seq), rc, delay)
             p = Process(target=f(switch), name=switch.name)
-            self._worker_mapping[switch.name] = _ManagerItem(tag, seq, p, switch)
+            self._worker_mapping[switch.name] = _ManagerItem.new(p, switch)
             p.start()
         return 1
 
@@ -66,11 +72,7 @@ class WorkerManager:
 
     def stats(self):
         with self.lock:
-            return tuple(
-                map(
-                    lambda it: dict(tag=it.switch.name, alive=it.process.is_alive(), pid=it.process.pid),
-                    self._worker_mapping.values()
-                ))
+            return tuple(map(lambda it: it.stats(), self._worker_mapping.values()))
 
     def close(self, tag: str, prefix: bool = False):
         with self.lock:
