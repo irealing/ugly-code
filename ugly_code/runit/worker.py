@@ -193,7 +193,7 @@ class Runner(RunIt):
         for info in self._fork_mapping.values():
             info.auto and self.start(info.tag)
         self.wait_for_close()
-        xml_server and xml_server.server_close()
+        xml_server and xml_server.shutdown()
         self.manager.close("", True)
         self.manager.join()
 
