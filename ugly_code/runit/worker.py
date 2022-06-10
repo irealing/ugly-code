@@ -90,7 +90,7 @@ class WorkerManager:
         for item in self._worker_mapping.values():
             if not item.process.is_alive():
                 continue
-            _println("join {}", item.switch.name)
+            _println("{} join {}", self.__class__.__name__, item.switch.name)
             item.process.join()
 
 
@@ -213,7 +213,7 @@ class Runner(RunIt):
     def make_rpc_worker(self):
         if not self._m:
             return
-        server = SimpleXMLRPCServer(self._m)
+        server = SimpleXMLRPCServer(self._m, logRequests=False)
         server.register_instance(_RpcMonitor(self))
         threading.Thread(target=server.serve_forever, name="{}-XmlRpcServer".format(self.tag)).start()
         return server
