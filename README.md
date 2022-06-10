@@ -124,6 +124,44 @@ if __name__ == '__main__':
 
 ```
 
+#### 使用xml-rpc管理进程
+
+```python3
+import threading
+import time
+
+from ugly_code.runit import Worker, Runner, RuntItMonitor
+
+
+class AWorker(Worker):
+    def serve(self):
+        while self.switch.on:
+            print(f"{self.switch.name} {time.time()}")
+            time.sleep(3.0)
+
+
+def start_and_close_task(m, tag):
+    time.sleep(10)
+    monitor = RuntItMonitor(m)
+    monitor.start(tag)
+    monitor.start(tag)
+    time.sleep(3)
+    print(monitor.stats())
+    monitor.close(tag, True)
+    time.sleep(3)
+    monitor.prune()
+    print(monitor.stats())
+    monitor.shutdown()
+
+
+if __name__ == '__main__':
+    m = ('127.0.0.1', 65432)
+    runner = Runner(None, (("a", AWorker, 0, 0, False), ('b', AWorker)), m=m)
+    threading.Thread(target=start_and_close_task, args=("http://{}:{}".format(*m), "a",)).start()
+    runner.run()
+
+```
+
 [查看文档](doc/ugly_code/runit/index.md)
 
 ## 扩展工具集
@@ -138,4 +176,4 @@ print(obj.d.a)
 
 ```
 
-*[更多说明](http://vvia.xyz/wnBAQb)*
+*[更多说明](https://github.com/irealing/ugly-code)*

@@ -30,9 +30,15 @@ class Worker(RunIt, metaclass=abc.ABCMeta):
 
 class _ManagerItem(NamedTuple):
     tag: str
-    seq: int
     process: Process
     switch: Switch
+
+    def stats(self) -> dict:
+        return dict(tag=self.tag, pid=self.process.pid, alive=self.process.is_alive())
+
+    @staticmethod
+    def new(process: Process, switch: Switch) -> '_ManagerItem':
+        return _ManagerItem(switch.name, process, switch)
 
 
 class WorkerManager:
@@ -51,7 +57,7 @@ class WorkerManager:
             seq = self.get_seq(tag)
             switch = Switch(tag if not seq else "{}-{}".format(tag, seq), rc, delay)
             p = Process(target=f(switch), name=switch.name)
-            self._worker_mapping[switch.name] = _ManagerItem(tag, seq, p, switch)
+            self._worker_mapping[switch.name] = _ManagerItem.new(p, switch)
             p.start()
         return 1
 
@@ -66,11 +72,7 @@ class WorkerManager:
 
     def stats(self):
         with self.lock:
-            return tuple(
-                map(
-                    lambda it: dict(tag=it.switch.name, alive=it.process.is_alive(), pid=it.process.pid),
-                    self._worker_mapping.values()
-                ))
+            return tuple(map(lambda it: it.stats(), self._worker_mapping.values()))
 
     def close(self, tag: str, prefix: bool = False):
         with self.lock:
@@ -88,7 +90,7 @@ class WorkerManager:
         for item in self._worker_mapping.values():
             if not item.process.is_alive():
                 continue
-            _println("join {}", item.switch.name)
+            _println("{} join {}", self.__class__.__name__, item.switch.name)
             item.process.join()
 
 
@@ -193,7 +195,7 @@ class Runner(RunIt):
         for info in self._fork_mapping.values():
             info.auto and self.start(info.tag)
         self.wait_for_close()
-        xml_server and xml_server.server_close()
+        xml_server and xml_server.shutdown()
         self.manager.close("", True)
         self.manager.join()
 
@@ -211,7 +213,7 @@ class Runner(RunIt):
     def make_rpc_worker(self):
         if not self._m:
             return
-        server = SimpleXMLRPCServer(self._m)
+        server = SimpleXMLRPCServer(self._m, logRequests=False)
         server.register_instance(_RpcMonitor(self))
         threading.Thread(target=server.serve_forever, name="{}-XmlRpcServer".format(self.tag)).start()
         return server
