@@ -60,8 +60,6 @@ class WorkerManager:
             tags = filter(lambda it: not it.process.is_alive(), self._worker_mapping.values())
             c = 0
             for tag in tuple(tags):
-                item = self._worker_mapping[tag.switch.name]
-                item.process.close()
                 del self._worker_mapping[tag.switch.name]
                 c += 1
             return c
