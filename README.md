@@ -1,9 +1,13 @@
 # ugly-code
+
+[TOC]
+
 ## 安装
 
 ```shell
 $ pip install ugly-code
 ```
+
 
 ## Command 工具
 
@@ -83,80 +87,48 @@ Command line create by ugly-code.
 
 由示例可发现，CMDHolder可以持有多个命令行工具，根据不同的参数调用不同的命令行对象。而且还可以自定义命令行工具的名称与介绍。
 
+## 多进程管理工具(ugly_code.runit)
 
-## 安装方法
+`ugly_code.runit` 多任务管理工具。使用 `Runner`和`Worker`管理多进程程序。支持XML-RPC控制任务启停。
 
-```shell
-$ pip install ugly-code
-```
-## 网络/IP相关工具
+一个Worker对应一个进程，各进程使用tag区分。
 
-### IP工具(IPv4)
-#### IP地址和INT互转
-```python
-from ugly_code.net import IPv4
-# IP地址转INT
-iv = IPv4.ipn("192.168.99.0")
-print(iv)
-# 输出 3232260864
-# INT 转为IP
-ip=IPv4.nip(iv)
-print(ip)
-# 输出 192.168.99.0
-```
+使用方式:
+    注册任务到Runner，启动Runner即可自动\手动启动任务或使用XML-RPC接口对任务进行调度管理。
 
-#### 是否私有IP
+### 示例
 
-```python
-from ugly_code.net import IPv4
+```python3
+import threading
+import time
 
-iv=IPv4("192.168.99.233")
+from ugly_code.runit import Switch, Worker, Runner
 
-print(iv.is_private())
-# 输出 True
-```
 
-#### 其它
+class AWorker(Worker):
+    def serve(self):
+        while self.switch.on:
+            print(f"{self.switch.name} {time.time()}")
+            time.sleep(3.0)
 
-```python
-from ugly_code.net import IPv4
 
-ip = IPv4('192.168.99.233')
-# 获取默认子网掩码
-print(ip.default_mask_str())
-# 输出  255.255.255.0
+def close_it(switch: Switch):
+    time.sleep(10)
+    switch.close()
 
-#  检测是否本地回环地址
-print(ip.is_loop_back())
-# 输出 False
+
+if __name__ == '__main__':
+    st = Switch('Runner')
+    threading.Thread(target=close_it, args=(st,)).start()
+    Runner(st, (("a", AWorker), ('b', AWorker)), m=('127.0.0.1', 0)).run()
+
 ```
 
-* `IPv4`重写了包含 *>*、*<*、*==*、*!=*、*<=*、*>=* 的操作符
+[查看文档](doc/ugly_code/runit/index.md)
 
-### Network工具
+## 扩展工具集
 
-```python
-from ugly_code.net import IPv4,Network
-
-nt = Network('192.168.99.0',mask=24)
-# 输出网络地址
-print(nt.net_address())
-# 输出 192.168.99.0
-print(Network('10.0.0.235',mask=24))
-# 输出 10.0.0.0
-# 输出子网掩码
-print(nt.mask())
-# 输出 255.255.255.0
-# 输出广播地址
-print(nt.broadcast_address())
-# 输出 192.168.99.255
-# 检测 IP 是否在该网络中
-print(IPv4('192.168.99.99') in nt)
-# 输出结果 True
-```
-### 扩展工具集
-
-#### 对象代理工具
+### 对象代理工具
 
 ```python
 from ugly_code.ex import ObjectProxy
