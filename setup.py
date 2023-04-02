@@ -13,12 +13,15 @@ with open('README.md', 'r', encoding='utf-8') as f:
 setup(
     name="ugly_code",
     url='https://github.com/irealing/ugly-code',
-    version="0.0.8", license='MIT',
+    version="0.0.9", license='MIT',
     author=__author__,
     author_email='irealing@163.com',
     platforms='any',
     description="ugly-code tools",
     long_description=readme,
     long_description_content_type="text/markdown",
-    packages=find_packages()
+    packages=find_packages(),
+    extras_require={
+        "rabbit": ["pika"]
+    }
 )
