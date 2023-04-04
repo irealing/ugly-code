@@ -176,4 +176,52 @@ print(obj.d.a)
 
 ```
 
+## RabbitMQ监听工具
+
+### 安装
+
+```shell
+$ pip install ugly-code[rabbit]
+```
+
+### 示例
+
+```python
+
+import threading
+import time
+
+from pika import BasicProperties
+from pika.adapters.blocking_connection import BlockingChannel
+from pika.spec import Basic
+
+from ugly_code.rabbit import ListenOpt, default_listen_ctx, RabbitListenCtx
+
+opt = ListenOpt(
+    queue='test',
+    uri="amqp://guest:guest@127.0.0.1:5672/test",
+    exchange='test',
+    ext='direct',
+    routing_key='test',
+    durable=True,
+    prefetch=1,
+    retry_delay=1.0,
+    retry=False
+)
+
+
+def handle_message(channel: BlockingChannel, deliver: Basic.Deliver, props: BasicProperties, body: bytes):
+    print(body)
+    channel.connection.process_data_events(3)
+
+
+def close_it(val: RabbitListenCtx):
+    time.sleep(10)
+    val.shutdown()
+
+
+with default_listen_ctx(opt).start(handle_message) as ctx:
+    threading.Thread(target=close_it, args=(ctx,)).start()
+```
+
 *[更多说明](https://github.com/irealing/ugly-code)*
