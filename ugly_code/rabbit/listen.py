@@ -7,6 +7,7 @@ from typing import Optional, Tuple
 
 from pika import BlockingConnection, URLParameters
 from pika.adapters.blocking_connection import BlockingChannel
+from pika.exceptions import ConnectionClosedByBroker
 
 from ugly_code.rabbit.define import ListenOpt, ConnectFunc, ConsumeFunc
 
@@ -54,7 +55,11 @@ class BaseListenCtx(RabbitListenCtx):
         channel, tag = self._bind()
         msg_gen = channel.consume(self._opt.queue, False, inactivity_timeout=0.1)
         while not self._event.is_set():
-            msg = next(msg_gen)
+            try:
+                msg = next(msg_gen)
+            except StopIteration:
+                self.logger.warning("pika consumer exit with StopIteration")
+                break
             if msg == (None, None, None):
                 if self._event.is_set():
                     self.logger.info("close event is set,break")
@@ -67,10 +72,11 @@ class BaseListenCtx(RabbitListenCtx):
                     func(channel, method, properties, body)
                 channel.basic_ack(method.delivery_tag)
             except Exception as e:
-                self.logger.exception("invoce callback method exception %s %s", e.__class__.__name__, e)
+                self.logger.exception("invoke callback method exception %s %s", e.__class__.__name__, e)
                 channel.basic_nack(method.delivery_tag)
         channel.cancel()
         channel.close()
+        channel.connection.close()
 
     def _bind(self) -> Tuple[BlockingChannel, str]:
         connection = self._connect()
