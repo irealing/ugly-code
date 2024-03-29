@@ -10,7 +10,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 setup(
     name="ugly_code",
     url='https://github.com/irealing/ugly-code',
-    version="0.0.11", license='MIT',
+    version="0.0.13", license='MIT',
     author=__author__,
     author_email='irealing@163.com',
     platforms='any',
